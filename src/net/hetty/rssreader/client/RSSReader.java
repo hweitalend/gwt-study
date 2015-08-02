@@ -1,7 +1,6 @@
 package net.hetty.rssreader.client;
 
 import com.extjs.gxt.ui.client.Style.LayoutRegion;
-import com.extjs.gxt.ui.client.widget.ContentPanel;
 import com.extjs.gxt.ui.client.widget.Viewport;
 import com.extjs.gxt.ui.client.widget.layout.BorderLayout;
 import com.extjs.gxt.ui.client.widget.layout.BorderLayoutData;
@@ -23,7 +22,6 @@ public class RSSReader implements EntryPoint {
 
 		final BorderLayout borderLayout = new BorderLayout();
 		viewport.setLayout(borderLayout);
-		RootPanel.get().add(viewport);
 
 		addHeader(viewport);
 		
@@ -31,8 +29,7 @@ public class RSSReader implements EntryPoint {
 		
 		addNavigator(viewport);
 		
-		viewport.layout();
-		
+		RootPanel.get().add(viewport);
 	}
 
 	private void addNavigator(Viewport viewport) {
@@ -40,14 +37,14 @@ public class RSSReader implements EntryPoint {
 		westData.setCollapsible(true);
 		westData.setSplit(true);
 		
-		ContentPanel navPanel = new ContentPanel();
+		RssNavigationPanel navPanel = new RssNavigationPanel();
 		viewport.add(navPanel, westData);
 	}
 
 	private void addContent(Viewport viewport) {
 		BorderLayoutData centerData = new BorderLayoutData(LayoutRegion.CENTER);
 		centerData.setCollapsible(false);
-		ContentPanel mainPanel = new ContentPanel();
+		RssMainPanel mainPanel = new RssMainPanel();
 		viewport.add(mainPanel, centerData);
 	}
 
