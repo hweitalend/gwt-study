@@ -32,3 +32,13 @@ font: normal 10px arial, tahoma, sans-serif;
 background: url(gxt/images/gxt/icons/feed_link.png) no-repeat center left
 !important;
 }
+
+.create-feed {
+background: url(gxt/images/gxt/icons/feed_link.png) no-repeat center left
+!important;
+}
+
+.save {
+background: url(gxt/images/gxt/icons/folder.png) no-repeat center left
+!important;
+}

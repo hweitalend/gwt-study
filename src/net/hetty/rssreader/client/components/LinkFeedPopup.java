@@ -32,6 +32,17 @@ public class LinkFeedPopup extends Popup {
 		super.onRender(parent, pos);
 
 		setLayout();
+
+		addValidator();
+	}
+
+	private void addValidator() {
+		tfUrl.setAllowBlank(false);
+		tfUrl.setRegex("^http\\://[a-zA-Z0-9\\-\\.]+\\.[a-zA-Z]{2,3}(/\\S*)?$");
+		tfUrl.setAllowBlank(false);
+		tfUrl.getMessages().setBlankText("Please enter the URL of an existing feed");
+		tfUrl.setAutoValidate(true);
+		tfUrl.getMessages().setRegexText("The link field must be a URL e.g. http://www.example.com/rss.xml");
 	}
 
 	private void setLayout() {
@@ -51,7 +62,7 @@ public class LinkFeedPopup extends Popup {
 		add(tfUrl, centerData);
 
 		final BorderLayoutData eastData = new BorderLayoutData(LayoutRegion.EAST, 50);
-		eastData.setMargins(new Margins(2));
+		eastData.setMargins(new Margins(2, 2, 2, 20));
 		add(btnAdd, eastData);
 	}
 

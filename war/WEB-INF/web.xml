@@ -4,12 +4,22 @@
     "http://java.sun.com/dtd/web-app_2_3.dtd">
 
 <web-app>
-  
-  <!-- Servlets -->
-  
-  <!-- Default page to serve -->
-  <welcome-file-list>
-    <welcome-file>RSSReader.html</welcome-file>
-  </welcome-file-list>
+
+	<!-- Servlets -->
+	<servlet>
+		<servlet-name>feedServlet</servlet-name>
+		<servlet-class>
+			net.hetty.rssreader.server.services.FeedServiceImpl
+		</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>feedServlet</servlet-name>
+		<url-pattern>/rssreader/feed-service</url-pattern>
+	</servlet-mapping>
+
+	<!-- Default page to serve -->
+	<welcome-file-list>
+		<welcome-file>RSSReader.html</welcome-file>
+	</welcome-file-list>
 
 </web-app>
