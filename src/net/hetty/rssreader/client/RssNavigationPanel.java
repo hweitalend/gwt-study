@@ -9,10 +9,12 @@ import com.extjs.gxt.ui.client.widget.Info;
 import com.extjs.gxt.ui.client.widget.Window;
 import com.extjs.gxt.ui.client.widget.button.Button;
 import com.extjs.gxt.ui.client.widget.button.ToggleButton;
+import com.extjs.gxt.ui.client.widget.layout.FitLayout;
 import com.extjs.gxt.ui.client.widget.tips.ToolTipConfig;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 import net.hetty.rssreader.client.components.LinkFeedPopup;
+import net.hetty.rssreader.client.list.FeedList;
 import net.hetty.rssreader.client.services.FeedServiceAsync;
 import net.hetty.rssreader.client.windows.FeedWindow;
 import net.hetty.rssreader.shared.model.Feed;
@@ -48,6 +50,9 @@ public class RssNavigationPanel extends ContentPanel {
 				createNewFeedWindow();
 			}
 		});
+		
+		setLayout(new FitLayout());
+		add(new FeedList());
 	}
 
 	private void addCreateFeedButton() {

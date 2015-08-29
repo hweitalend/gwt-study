@@ -1,28 +1,66 @@
 package net.hetty.rssreader.server.services;
 
 import java.io.IOException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import org.jdom2.Attribute;
-import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.output.Format;
-import org.jdom2.output.XMLOutputter;
+import org.jdom.Attribute;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.JDOMException;
+import org.jdom.input.SAXBuilder;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 import net.hetty.rssreader.client.services.FeedService;
+import net.hetty.rssreader.server.utils.FilePersistence;
+import net.hetty.rssreader.server.utils.Persistence;
 import net.hetty.rssreader.shared.model.Feed;
+import net.hetty.rssreader.shared.model.Item;
 
 public class FeedServiceImpl extends RemoteServiceServlet implements FeedService {
+
+	private final static Logger LOGGER = Logger.getLogger(FeedServiceImpl.class.getName());
+
+	private Map<String, Feed> feeds = new HashMap<String, Feed>();
+
+	private final Persistence persistence = new FilePersistence();
+
 	@Override
 	public Feed createNewFeed() {
 		UUID uuid = UUID.randomUUID();
 		return new Feed(uuid.toString());
 	}
 
+	private Feed loadFeed(String feedUrl) {
+		Feed feed = new Feed(feedUrl);
+		try {
+			SAXBuilder parser = new SAXBuilder();
+			Document document = parser.build(new URL(feedUrl));
+			Element eleRoot = document.getRootElement();
+			Element eleChannel = eleRoot.getChild("channel");
+			feed.setTitle(eleChannel.getChildText("title"));
+			feed.setDescription(eleChannel.getChildText("description"));
+			feed.setLink(eleChannel.getChildText("link"));
+			return feed;
+		} catch (IOException e) {
+			LOGGER.log(Level.SEVERE, "IO Error loading feed", e);
+			return feed;
+		} catch (JDOMException e) {
+			LOGGER.log(Level.SEVERE, "Error parsing feed", e);
+			return feed;
+		}
+	}
+
 	public void saveFeed(Feed feed) {
-		
+
 		Element eleRoot = new Element("rss");
 		eleRoot.setAttribute(new Attribute("version", "2.0"));
 		// Create a document from the feed object
@@ -39,15 +77,55 @@ public class FeedServiceImpl extends RemoteServiceServlet implements FeedService
 		eleChannel.addContent(eleLink);
 		eleRoot.addContent(eleChannel);
 
-		try {
-			XMLOutputter serializer = new XMLOutputter();
-			Format prettyFormat = Format.getPrettyFormat();
-			serializer.setFormat(prettyFormat);
-			System.out.println("At this point we would serialize the feed " + feed.getTitle()
-					+ " to a file. For now we are just going to write it to the console.");
-			serializer.output(document, System.out);
-		} catch (IOException e) {
-			System.out.println("Error saving feed");
+		persistence.saveFeedXml(feed.getUuid(), document);
+		addExistingFeed(persistence.getUrl(feed.getUuid()));
+	}
+
+	@Override
+	public void addExistingFeed(String feedUrl) {
+		Feed loadResult = loadFeed(feedUrl);
+		if (loadResult.getTitle() != null) {
+			feeds.put(feedUrl, loadFeed(feedUrl));
+			persistence.saveFeedList(feeds.keySet());
 		}
 	}
+
+	@Override
+	public List<Feed> loadFeedList() {
+		feeds.clear();
+		Set<String> feedUrls = persistence.loadFeedList();
+		for (String feedUrl : feedUrls) {
+			feeds.put(feedUrl, loadFeed(feedUrl));
+		}
+		return new ArrayList<Feed>(feeds.values());
+	}
+
+	@Override
+	public List<Item> loadItems(String feedUrl) {
+		List<Item> items = new ArrayList<Item>();
+		try {
+			SAXBuilder parser = new SAXBuilder();
+			Document document = parser.build(new URL(feedUrl));
+			Element eleRoot = document.getRootElement();
+			Element eleChannel = eleRoot.getChild("channel");
+			List<Element> itemElements = eleChannel.getChildren("item");
+			for (Element eleItem : itemElements) {
+				Item item = new Item();
+				item.setTitle(eleItem.getChildText("title"));
+				item.setDescription(eleItem.getChildText("description"));
+				item.setLink(eleItem.getChildText("link"));
+				item.setCategory(eleItem.getChildText("category"));
+				items.add(item);
+			}
+			return items;
+		} catch (IOException e) {
+			e.printStackTrace();
+			return items;
+
+		} catch (JDOMException e) {
+			e.printStackTrace();
+			return items;
+		}
+	}
+
 }

@@ -1,6 +1,10 @@
 package net.hetty.rssreader.client.forms;
 
 import com.extjs.gxt.ui.client.Registry;
+import com.extjs.gxt.ui.client.data.BeanModel;
+import com.extjs.gxt.ui.client.data.BeanModelFactory;
+import com.extjs.gxt.ui.client.data.BeanModelLookup;
+import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.widget.Info;
 import com.extjs.gxt.ui.client.widget.form.FormPanel;
 import com.extjs.gxt.ui.client.widget.form.TextArea;
@@ -10,7 +14,6 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 
 import net.hetty.rssreader.client.RSSReaderConstants;
 import net.hetty.rssreader.client.services.FeedServiceAsync;
-import net.hetty.rssreader.server.services.FeedServiceImpl;
 import net.hetty.rssreader.shared.model.Feed;
 
 public class FeedForm extends FormPanel {
@@ -53,6 +56,9 @@ public class FeedForm extends FormPanel {
 			@Override
 			public void onSuccess(Void result) {
 				Info.display("RSS Reader", "Feed " + feed.getTitle() + " saved sucessfully");
+				final ListStore<BeanModel> feedStore = Registry.get(RSSReaderConstants.FEED_STORE);
+				BeanModelFactory beanModelFactory = BeanModelLookup.get().getFactory(feed.getClass());
+				feedStore.add(beanModelFactory.createModel(feed));
 			}
 		});
 	}

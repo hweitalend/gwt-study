@@ -2,6 +2,8 @@ package net.hetty.rssreader.client;
 
 import com.extjs.gxt.ui.client.Registry;
 import com.extjs.gxt.ui.client.Style.LayoutRegion;
+import com.extjs.gxt.ui.client.data.BeanModel;
+import com.extjs.gxt.ui.client.store.ListStore;
 import com.extjs.gxt.ui.client.widget.Viewport;
 import com.extjs.gxt.ui.client.widget.layout.BorderLayout;
 import com.extjs.gxt.ui.client.widget.layout.BorderLayoutData;
@@ -23,6 +25,7 @@ public class RSSReader implements EntryPoint {
 	public void onModuleLoad() {
 
 		Registry.register(RSSReaderConstants.FEED_SERVICE, GWT.create(FeedService.class));
+		Registry.register(RSSReaderConstants.FEED_STORE, new ListStore<BeanModel>());
 
 		Viewport viewport = new Viewport();
 

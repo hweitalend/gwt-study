@@ -1,11 +1,13 @@
 package net.hetty.rssreader.client.components;
 
+import com.extjs.gxt.ui.client.Registry;
 import com.extjs.gxt.ui.client.Style.LayoutRegion;
 import com.extjs.gxt.ui.client.event.ButtonEvent;
 import com.extjs.gxt.ui.client.event.ComponentEvent;
 import com.extjs.gxt.ui.client.event.KeyListener;
 import com.extjs.gxt.ui.client.event.SelectionListener;
 import com.extjs.gxt.ui.client.util.Margins;
+import com.extjs.gxt.ui.client.widget.Info;
 import com.extjs.gxt.ui.client.widget.Popup;
 import com.extjs.gxt.ui.client.widget.Text;
 import com.extjs.gxt.ui.client.widget.button.Button;
@@ -14,7 +16,10 @@ import com.extjs.gxt.ui.client.widget.layout.BorderLayout;
 import com.extjs.gxt.ui.client.widget.layout.BorderLayoutData;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.user.client.Element;
-import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+
+import net.hetty.rssreader.client.RSSReaderConstants;
+import net.hetty.rssreader.client.services.FeedServiceAsync;
 
 public class LinkFeedPopup extends Popup {
 
@@ -82,8 +87,21 @@ public class LinkFeedPopup extends Popup {
 		});
 	}
 
-	public void addFeed(String url) {
-		Window.alert("We would now attempt to add " + url + " at this point");
+	public void addFeed(final String feedUrl) {
+		final FeedServiceAsync feedService = Registry.get(RSSReaderConstants.FEED_SERVICE);
+		feedService.addExistingFeed(feedUrl, new AsyncCallback<Void>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				Info.display("RSS Reader", "Failed to add feed at: " + feedUrl);
+			}
+
+			@Override
+			public void onSuccess(Void result) {
+				tfUrl.clear();
+				Info.display("RSS Reader", "Feed at " + feedUrl + " added successfully");
+				hide();
+			}
+		});
 	}
 
 }
